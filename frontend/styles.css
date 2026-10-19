@@ -1,0 +1,49 @@
+:root { color-scheme: dark; --bg:#111318; --panel:#1a1e26; --acc:#1db954; --txt:#e8eaf0; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--txt); font:16px/1.4 system-ui,sans-serif; }
+header { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; border-bottom:1px solid #2a2f3a; }
+h1 { font-size:20px; margin:0; } .sub { color:#9aa; font-weight:400; font-size:13px; }
+.conn { font-size:13px; color:#fc3; } .conn.ok { color:var(--acc); } .conn.bad { color:#f66; } .conn.warn { color:#fc3; }
+.toast { background:#5a1f1f; color:#ffd9d9; padding:8px 16px; font-size:14px; }
+main { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:16px 20px; max-width:1000px; margin:0 auto; }
+@media (max-width:700px){ main{ grid-template-columns:1fr; } }
+.panel { background:var(--panel); border-radius:12px; padding:16px; }
+.sources { display:flex; flex-direction:column; gap:8px; }
+.src { text-align:left; background:#232834; border:2px solid transparent; border-radius:10px; padding:10px; color:inherit; cursor:pointer; display:flex; gap:10px; align-items:center; min-height:44px; }
+.src .cardtext, .active .cardtext, .track .cardtext { display:flex; flex-direction:column; gap:4px; flex:1; }
+.thumb { width:48px; height:48px; border-radius:8px; object-fit:cover; flex:none; background:#2a3140; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.bigart { width:96px; height:96px; border-radius:12px; object-fit:cover; flex:none; background:#2a3140; display:flex; align-items:center; justify-content:center; font-size:48px; }
+.active { display:flex; gap:12px; align-items:center; }
+.noart { color:#9aa; }
+.search form { display:flex; gap:8px; }
+.search input[type=search] { flex:1; padding:10px; border-radius:10px; border:1px solid #2a3140; background:#111318; color:inherit; font-size:15px; }
+.search button, .track button { padding:10px 16px; min-height:44px; border-radius:10px; border:0; background:var(--acc); color:#fff; cursor:pointer; font-size:15px; }
+.results { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.track { display:flex; gap:10px; align-items:center; background:#232834; border-radius:10px; padding:8px; }
+.help { color:#9aa; font-size:14px; }
+#settingsform { display:flex; flex-direction:column; gap:10px; }
+#settingsform label { display:flex; flex-direction:column; gap:4px; font-size:14px; }
+#settingsform input, #settingsform select { padding:10px; border-radius:10px; border:1px solid #2a3140; background:#111318; color:inherit; font-size:15px; min-height:44px; }
+#settingsform .row { display:flex; gap:8px; }
+#settingsform button { padding:10px 16px; min-height:44px; border-radius:10px; border:0; background:var(--acc); color:#fff; cursor:pointer; font-size:15px; }
+#set-clear { background:#2a3140 !important; }
+.src.active { border-color:var(--acc); }
+.src:focus-visible, .controls button:focus-visible, input:focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+.badge { font-size:11px; letter-spacing:.06em; padding:2px 6px; border-radius:6px; background:#2a3140; color:#9fd; width:fit-content; }
+.badge.k-spotify { background:#0d3b22; color:#6fe3a1; }
+.badge.k-ytm { background:#3b0d0d; color:#ff9d9d; }
+.badge.k-browser { background:#0d2a3b; color:#9fd3ff; }
+.live { color:var(--acc); font-size:12px; }
+.degraded { color:#ffb84d; font-size:12px; }
+.meta,.origin { font-size:13px; color:#9aa; }
+.origin { font-size:11px; opacity:.8; }
+.seek { display:flex; align-items:center; gap:8px; margin-top:12px; font-size:12px; color:#9aa; }
+.seek input { flex:1; }
+.controls { display:flex; gap:10px; margin-top:12px; }
+.controls button { font-size:22px; padding:10px 18px; min-height:44px; min-width:44px; border-radius:10px; border:0; background:#2a3140; color:#fff; cursor:pointer; }
+.controls .big { background:var(--acc); }
+.vol { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+.vol input { width:100%; }
+.empty { color:#9aa; }
+footer { text-align:center; color:#777; font-size:12px; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }

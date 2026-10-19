@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>RMC — Remote Media Control</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header>
+  <h1>RMC <span class="sub">remote media control</span></h1>
+  <div id="conn" class="conn" role="status" aria-live="polite">connecting…</div>
+</header>
+<div id="toast" class="toast" role="alert" hidden></div>
+<main>
+  <section class="panel" aria-label="Media sources">
+    <h2>Sources <span id="count"></span></h2>
+    <div id="sources" class="sources" role="group" aria-label="Choose active stream"><p class="empty">No sources yet.</p></div>
+  </section>
+  <section class="panel" aria-label="Now controlling">
+    <h2>Now controlling</h2>
+    <div id="active" class="active"><p class="empty">Nothing active.</p></div>
+    <div class="seek">
+      <span id="pos">0:00</span>
+      <input id="seek" type="range" min="0" max="100" value="0" step="1000" aria-label="Seek position" />
+      <span id="dur">0:00</span>
+    </div>
+    <div class="controls">
+      <button data-act="prev" aria-label="Previous track" title="Previous">⏮</button>
+      <button data-act="play" aria-label="Play" title="Play">▶</button>
+      <button data-act="pause" aria-label="Pause" title="Pause">⏸</button>
+      <button data-act="toggle" aria-label="Play or pause" title="Play/Pause" class="big">⏯</button>
+      <button data-act="next" aria-label="Next track" title="Next">⏭</button>
+    </div>
+    <div class="vol">
+      <label for="vol">Volume <span id="volnum">70%</span></label>
+      <input id="vol" type="range" min="0" max="100" value="70" aria-label="Volume" />
+    </div>
+  </section>
+  <section class="panel search" aria-label="Search Spotify">
+    <h2>Search Spotify</h2>
+    <form id="searchform">
+      <input id="q" type="search" placeholder="Song or artist…" aria-label="Search Spotify" autocomplete="off" />
+      <button type="submit">Search</button>
+    </form>
+    <div id="results" class="results"><p class="empty">Needs Spotify credentials — see README.</p></div>
+  </section>
+  <section class="panel" aria-label="Settings">
+    <h2>Settings <span id="setstatus" class="meta"></span></h2>
+    <form id="settingsform">
+      <label>Spotify Client ID <input id="set-id" type="text" autocomplete="off" placeholder="not set" /></label>
+      <label>Spotify Client secret <input id="set-secret" type="password" autocomplete="off" placeholder="not set" /></label>
+      <label>Spotify token (override) <input id="set-token" type="password" autocomplete="off" placeholder="not set" /></label>
+      <label>Browser volume
+        <select id="set-vol">
+          <option value="auto">Auto (MPRIS → system → remember)</option>
+          <option value="mpris">MPRIS only</option>
+          <option value="system">System only (whole app)</option>
+        </select>
+      </label>
+      <div class="row">
+        <button type="submit">Save</button>
+        <button type="button" id="set-clear">Clear tokens</button>
+      </div>
+      <p class="help">Saved on the server (owner-only file) — survives restarts. Ports/TLS need a restart; tokens and volume apply instantly. Values are never shown back.</p>
+    </form>
+  </section>
+</main>
+<footer><span id="lan">RMC · open this page from any device on your LAN</span></footer>
+<script src="/js/rmc-client.js"></script>
+<script src="/ytm-reporter.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

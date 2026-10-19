@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "round": 4,
+  "gate": "conditional-pass-pending-recritic",
+  "verified": {
+    "tests": "35 passed, 0 failed (cargo test, round 4: 13+9+3+6+4) + 13 JS smoke checks",
+    "server": "round-4 binary live on :8973, curl + node-WS verified",
+    "checks": [
+      "dead-player toggle -> ok:false internal + actuator_error in snapshot (lying cache closed)",
+      "WS bad-switch -> typed error w/ request_id",
+      "REST codes snake_case",
+      "unreport removes + sources back to seeds",
+      "static 200, JS parse clean, smoke 13/13"
+    ]
+  },
+  "modules": {
+    "backend": {
+      "score": 6,
+      "delta": "+2",
+      "issues": [
+        "ALL 7 CLAIMS VERIFIED (field, mark/clear, demo move, AdapterResult hook, bounded reconcile, test)",
+        "repro gate CLOSED on hook path; optimistic-first flicker remains (two broadcasts, crash window)",
+        "tab downlink still ok:true on queued-to-dead-tab (same lie class, uncovered)",
+        "apply_control still public/infallible cache-only primitive (bypass risk)",
+        "update_state clears error on any heartbeat, not on retry success",
+        "structural: String ids, bool register, no idempotency"
+      ],
+      "rounds": 4
+    },
+    "webserver": {
+      "score": 7,
+      "delta": "+0",
+      "issues": [
+        "ALL 9 CLAIMS CONFIRMED (AdapterResult hook, reconcile+tests, dead-tab honest, WS reg_err, unreport code_str+map drop, sweeper owned+broadcast, WS-close unreport, 64KB cap)",
+        "no rate limiting on LAN-open endpoints (P1)",
+        "tab path queue-and-pray: send failure ignored, optimistic ok (P2)",
+        "sweeper leaks tabs-map senders (P3)",
+        "actuator failure mapped to 400 not 500/504 (P4)",
+        "ingest double revision bump (P5)",
+        "report no Ack, dual static serving, optimistic flicker window"
+      ],
+      "rounds": 4
+    },
+    "frontend": {
+      "score": 5,
+      "delta": "+3",
+      "issues": [
+        "ALL 8 CLAIMS VERIFIED (parse clean, no-fallback, vol disable, group, rev guard, _html reset, degraded badge, nonce identity)",
+        "stale sliders on no-active/empty early returns (same lie class)",
+        "degraded badge missing from active panel (list only)",
+        "activeNorm unguarded vs missing sources",
+        "Number coercion inconsistent (duration raw)",
+        "REST revision || 0 collapse",
+        "reporter: next/prev no-op, play/pause-only handlers, 2s first-push delay",
+        "no DOM tests, single-slot toast, no artwork"
+      ],
+      "rounds": 4
+    },
+    "client-connection": {
+      "score": 7.5,
+      "delta": "+0.5",
+      "issues": [
+        "VERIFIED: symlink intact, _dispatch real, 13/13 green, flat shapes agree, ack exact-value both sides",
+        "OVERCLAIMED: no true Rust<->JS interop (shared vectors never cross the boundary) \u2014 #1 gap downgraded, not closed",
+        "reconnect/hello path untested",
+        "REST no correlation, report no Ack",
+        "no offline queue",
+        "stringly status/kind leftovers"
+      ],
+      "rounds": 4
+    },
+    "spotify": {
+      "score": 6,
+      "delta": "+1",
+      "issues": [
+        "VERIFIED: result-returning hook (main.rs:86-98), Err propagates, reconcile trusted",
+        "optimistic-lie on CONTROL lifted; presence lie stands: demo-seed ghost never evicted (P0)",
+        "zero happy-path tests (P1)",
+        "poll-only no signals (P2)",
+        "Web API vapor (P3)",
+        "adapter-type split + coarse errors (P4/P5)"
+      ],
+      "rounds": 4
+    },
+    "youtube-music": {
+      "score": 7,
+      "delta": "+1",
+      "issues": [
+        "VERIFIED: nonce identity (clones distinct), sweeper owned+w/ broadcast, WS-close unreport guarded, dead-tab honest failure + test",
+        "nonce costs: stable ?tab= broken, name churns on reload, active dangles",
+        "sweeper leaks tabs-map senders (P0)",
+        "next/prev explicit no-ops (P1)",
+        "REST-only tabs second-class w/ Internal code (P2)",
+        "schema minimal, no inject doc (P2/P3)"
+      ],
+      "rounds": 4
+    }
+  },
+  "gate_remediation": {
+    "gate": "FAIL (conditional) -> remediation applied for P0-1 minimum",
+    "changes": [
+      "demo seeds opt-in behind RMC_DEMO=1 (default boot honestly empty)",
+      "spotify monitor presence latch: evicts spotify:local only if seen&&missing>=3 (carve-out deleted)"
+    ],
+    "verified": [
+      "default :8973 boot -> sources:[] revision 0, honest empty UI",
+      "RMC_DEMO=1 :8975 -> seeds present, instance stopped after check",
+      "35 cargo tests + 13 JS smoke still green (spotify/server suites re-run)"
+    ],
+    "remaining_gate_conditions": [
+      "P0-2 optimistic-first window (documented, not fixed)",
+      "P0-3 tab queue-and-pray (documented, not fixed)",
+      "rate limiting/auth, tab identity churn, stale sliders, next/prev no-ops"
+    ]
+  },
+  "final_scores": {
+    "backend": 6,
+    "webserver": 7,
+    "frontend": 5,
+    "client-connection": 7.5,
+    "spotify": 6,
+    "youtube-music": 7
+  },
+  "live_verification": {
+    "date": "2026-10-13",
+    "player": "Spotify desktop on org.mpris.MediaPlayer2.spotify (user listening)",
+    "bug_found": "find_by_name matches Identity not bus name -> monitor never saw player (fixed: find_all + bus_matches with instance-suffix tolerance)",
+    "tests_added": [
+      "bus_name_predicate",
+      "poll_live_bus_reports_honest_invariants"
+    ],
+    "results": [
+      "poll finds live player (Spotify/spotify:local)",
+      "server snapshot shows real track/status/position/volume, origin mpris:...",
+      "volume-set-to-current (35) -> ok:true, no actuator_error, playback uninterrupted",
+      "37 cargo tests + 13 JS smoke green"
+    ]
+  },
+  "feature_work_2026_10_13": {
+    "browser_detection": "new integrations/mpris crate: watches ALL MPRIS players (Spotify, Brave/Chrome/Firefox, VLC); live-verified Brave+Spotify with real metadata+art",
+    "spotify_search": "POST /api/search (token-gated, honest 503) + POST /api/play via MPRIS OpenUri (raw dbus call); UI search panel with art+play",
+    "single_binary": "rust-embed frontend; one binary target rmc-server; verified serving UI+API from empty cwd",
+    "thumbnails": "art_url end-to-end (MPRIS artUrl + MediaSession artwork -> snapshots -> UI cards + hero art)",
+    "hook_change": "ControlHook now takes origin; MPRIS actuation resolved from mpris:{bus} origin; tab origins skip hook",
+    "tests": "39 cargo + 13 JS smoke, all green"
+  },
+  "feature_work_2026_10_13_browser_volume_search": {
+    "browser_volume_root_cause": "Chromium accepts MPRIS Volume Set but never applies it (Set ok, read-back unchanged 1.0) \u2014 protocol-level black hole",
+    "fix": [
+      "volume read-back verification in control path: mismatch -> honest Err + degraded mark + bookmarklet guidance (live-verified on Brave: ok:false)",
+      "tab bookmarklet: one-click reporter injection (?rmc= base override, script-src params, absolute beacon)",
+      "RmcClient base option for cross-origin REST",
+      "HTTPS twin (rcgen self-signed, dual serve :8973+:8974) so bookmarklet works on https pages like YouTube",
+      "UI bookmarklet panel built from /api/health tls fields"
+    ],
+    "spotify_token": [
+      "client-credentials flow: RMC_SPOTIFY_ID/SECRET with auto-mint+cache (60s skew), RMC_SPOTIFY_TOKEN as override",
+      "README rewritten: dashboard->create app->settings->export steps (old console Get-Token button is gone since 2023, verified via web)"
+    ],
+    "tests": "39 cargo + 13 JS smoke green"
+  },
+  "feature_work_2026_10_13_restructure_volume_settings": {
+    "single_crate": "workspace (7 crates) -> single package rmc, src/*.rs modules, one rmc-server binary; 45 cargo + 13 JS green post-migration",
+    "art_lag": "6-min bus-vs-RMC sampler: no transition captured, both agree throughout; mpris get_metadata is fresh-per-call (no cache); added transition-confirmation re-poll (700ms) on title/art change for staged publishes",
+    "browser_volume": "MPRIS->system-sink fallback (pactl) + remember-when-idle + apply-on-start; poll reports real sink volume; volume_mode setting (auto/mpris/system); read-back verification catches cosmetic players",
+    "settings": "src/settings.rs (0600 JSON, XDG), GET masked flags + POST save/clear, UI panel, env+./spotify one-time import, live-verified real search via imported creds",
+    "tests": "45 cargo (settings 2, sysaudio 4) + 13 JS smoke, all green"
+  },
+  "feature_work_2026_10_13_volume_art_signals": {
+    "spotify_volume_false_error": "root cause: Spotify applies volume async, immediate read-back raced old value. Fix: settle retries (5x150ms) before declaring ignored. Brave path unchanged (never converges -> honest Err). Spotify live re-verify pending (no player running).",
+    "bookmarklet_removed": "panel + builder JS + CSS + README section removed; reporter file/API retained dormant for tinkerers (?rmc/?tab). Rationale: system volume supersedes it.",
+    "mpris_signals": "Noctalia-style: PropertiesChanged subscription (event-triggered re-poll, 400ms debounce) + NameOwnerChanged (instant evict, no 3-miss wait); 2s poll remains as backstop. MAJOR FIX: watch mutations now broadcast (revision-compare) \u2014 polled desktop updates previously never reached WS clients (likely the real art-lag mechanism).",
+    "art_proxy": "GET /api/art?src= (id-scoped, file:// + http(s), 2MB cap, image-type gate, magic-byte sniff, 10-min cache); UI routes non-http art through it; Brave PNG verified 200 image/png.",
+    "tests": "47 cargo (sniff test) + 13 JS smoke green"
+  },
+  "feature_work_2026_10_13_warnings_build_env": {
+    "warnings": "0 rustc, 0 clippy --all-targets, fmt clean. lib.rs+main.rs split (pub API no longer warns); deleted dead AppState.pending_volumes plumbing; REST request_id echo on all control paths.",
+    "clippy_fixed": [
+      "derivable Default",
+      "identical if blocks",
+      "4x field-init",
+      "type alias ArtCache",
+      "bind_instead_of_map",
+      "useless .into()",
+      "needless borrow",
+      "let-return",
+      "MonitorOutcome Box"
+    ],
+    "build_docs": "README 'Building with cargo' section (prereqs, build/run/test/clippy/fmt, single-binary guarantee); fixed stale -p rmc-server invocations.",
+    "dotenv": "./.env (RMC_ENV_FILE override) with minimal parser (quotes, export prefix, comments, RMC_* only); precedence real-env > .env(fill gaps) > file; unit-tested; live-verified stale .env cannot clobber saved creds.",
+    "tests": "48 cargo + 13 JS smoke green"
+  },
+  "feature_work_2026_10_13_subnet_bind": {
+    "bind": "RMC_BIND accepts bare IP or CIDR (10.42.0.0/24 -> 10.42.0.165); both twins bind it; TLS cert regenerates with bound SAN; invalid/empty-subnet fails fast listing local addresses",
+    "verified": [
+      "ss shows 10.42.0.165:8973+8974 only",
+      "API via bound IP live",
+      "127.0.0.1 refused",
+      "bad subnet exits with address list"
+    ],
+    "tests": "51 cargo (bind parse/membership/resolve) + 13 JS smoke green; 0 clippy, fmt clean"
+  }
+}
